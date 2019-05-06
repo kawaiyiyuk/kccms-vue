@@ -193,7 +193,7 @@
             },
             //查找数据
             getdata() {
-                this.axios.post('/api/product/findData', {}).then((data) => {
+                this.axios.post('api/product/findData', {}).then((data) => {
                     this.tableData = data.data;
                     for (let i = 0; i < data.data.length; i++) {
                         this.tableData[i].serialNum = i + 1;
@@ -218,7 +218,7 @@
             //提交新增数据
             Formpost(type) {
                 this.form.date = this.DataValue;
-                this.axios.post('/api/product/addData',
+                this.axios.post('api/product/addData',
                     this.form
                 ).then((data) => {
                     this.$message({
@@ -240,7 +240,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.axios.post('/api/product/deleteData', {
+                    this.axios.post('api/product/deleteData', {
                         _id: row._id
                     }).then((data) => {
                         this.getdata()
@@ -266,7 +266,7 @@
 
             //编辑库存信息
             dataEdit() {
-                this.axios.post('/api/product/updateData',
+                this.axios.post('api/product/updateData',
                     this.rowData
                 ).then((data) => {
                     //console.log(this.rowData)
@@ -284,7 +284,7 @@
             },
             editInventory(index, row) {
                 this.editDialog = true;
-                this.axios.post('/api/product/findData', {_id: row._id}).then((data) => {
+                this.axios.post('api/product/findData', {_id: row._id}).then((data) => {
                     this.rowData = data.data[0];
                     console.log(data)
                 })
