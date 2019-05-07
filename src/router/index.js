@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Home from '@/components/Home'
+import library from '@/components/library'
 Vue.use(Router)
 
 export default new Router({
@@ -16,6 +17,11 @@ export default new Router({
       path:'/home',
       name: 'home',
       component: Home
+    },
+    {
+      path:'/library',
+      name: 'library',
+      component: library
     }
   ]
 })

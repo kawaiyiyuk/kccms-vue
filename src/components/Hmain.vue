@@ -8,15 +8,15 @@
         </el-row>
         <div class="table-wrap">
             <el-table
-                    :data="tableData"
+                    :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
                     border
                     class="main-table"
-                    style="width: 100%">
+                    style="width: 100%"><!--:data 是分页的重点-->
                 <el-table-column
                         align="center"
-                        prop="serialNum"
                         label="序号"
                         width="60">
+                    <template slot-scope="scope"><span>{{scope.$index+1}} </span></template>
                 </el-table-column>
                 <el-table-column
                         align="center"
@@ -69,13 +69,25 @@
                         label="操作"
                         width="250">
                     <template slot-scope="scope">
-                        <el-button type="success" size="small">查看</el-button>
+                        <el-button type="success" size="small" @click="showLibrary(scope.$index,scope.row)">查看</el-button>
                         <el-button type="primary" size="small" @click=" editInventory(scope.$index,scope.row)">编辑
                         </el-button>
                         <el-button type="danger" size="small" @click="deledata(scope.$index,scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
+        </div>
+        <!--分页-->
+        <div class="page">
+            <el-pagination
+                    background
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="tableData.length"
+                    :page-sizes="[5, 10, 20, 40]"
+                    :page-size="pagesize"
+                    @current-change="handleCurrentChange"
+                    @size-change="handleSizeChange">
+            </el-pagination>
         </div>
 
         <!--新增库存弹窗-->
@@ -178,11 +190,23 @@
                 tableData: [],
                 rowData: {},
                 rowDataValue: '',
-                isRouterAlive: true
+                isRouterAlive: true,
+                //分页初始页
+                currentPage:1,
+                //分页每页数据
+                pagesize:10,
 
             }
         },
         methods: {
+            //分页切换页码
+            handleCurrentChange(currentPage){
+                this.currentPage = currentPage;
+            },
+            //分页每页显示的数量
+            handleSizeChange(size){
+                this.pagesize = size
+            },
             handleClose(done) {
                 this.$confirm('确认关闭？')
                     .then(_ => {
@@ -195,9 +219,6 @@
             getdata() {
                 this.axios.post('api/product/findData', {}).then((data) => {
                     this.tableData = data.data;
-                    for (let i = 0; i < data.data.length; i++) {
-                        this.tableData[i].serialNum = i + 1;
-                    }
                     data.data.forEach((item, index) => {
                         if (item.date) {
                             let date = new Date(parseInt(item.date));
@@ -292,6 +313,11 @@
                 // this.rowDataValue = new Date(row.date) ;
                 // console.log(row)
 
+            },
+            //跳转到查看详情页面
+            showLibrary(index,row) {
+                this.$store.commit('getProductId',row._id);
+                this.$router.push({path:'/library'})
             }
         },
         mounted() {
@@ -353,6 +379,9 @@
             .main-dialog {
                 padding: 30px 40px 30px 20px;
             }
+        }
+        .page {
+            margin-top: 20px;
         }
     }
 

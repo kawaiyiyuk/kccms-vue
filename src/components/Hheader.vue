@@ -13,7 +13,13 @@
                             class="el-menu-demo"
                             mode="horizontal"
                             @select="handleSelect">
-                        <el-menu-item index="1">库存概览</el-menu-item>
+
+                            <el-menu-item index="1">
+                                <router-link class="el-menu-demo-a" to="/home">
+                                    库存概览
+                                </router-link>
+                            </el-menu-item>
+
                         <!--<el-submenu index="2">-->
                         <!--<template slot="title">我的工作台</template>-->
                         <!--<el-menu-item index="2-1">选项1</el-menu-item>-->
@@ -65,6 +71,9 @@
 
             .el-menu-demo {
                 border-bottom: none;
+                .el-menu-demo-a {
+                    text-decoration: none;
+                }
             }
         }
 
