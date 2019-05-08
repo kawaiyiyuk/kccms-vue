@@ -6,7 +6,11 @@ import router from './router'
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 import store from './store/store'
+import filters from './assets/js/filters';
 
+Object.keys(filters).forEach( key => {
+  Vue.filter(key, filters[key])
+})
 Vue.use(VueAxios,axios);
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';

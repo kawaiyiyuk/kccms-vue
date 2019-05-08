@@ -56,12 +56,13 @@
         padding: 0;
         border-bottom: 1px solid #eeeeee;
         .Hheader {
+            background-color: #ffffff;
             width: 100%;
             position: fixed;
             top: 0px;
             padding: 0;
             border-bottom: 1px solid #eeeeee;
-            z-index: 2;
+            z-index: 20;
 
             .row-logo {
                 height: 60px;

@@ -12,7 +12,8 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api': {
-                target: 'http://api.wanghaiou.com',
+                // target: 'http://api.wanghaiou.com',  //线上数据地址
+                target: 'http://127.0.0.1:3000', //本地数据地址
                 changeOrigin: true,
                 pathRewrite: {
                     '^/api': ''
