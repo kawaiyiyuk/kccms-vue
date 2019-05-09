@@ -6,6 +6,17 @@
                 <el-button type="success" @click=" addDialog = true">新增库存</el-button>
             </div>
         </el-row>
+
+        <div class="main-search">
+            <el-autocomplete
+                    v-model="searchNameState"
+                    :fetch-suggestions="querySearchAsync"
+                    placeholder="请输入商品名称"
+                    @select="handleSelect"
+            ></el-autocomplete>
+            <el-button @click="fuzzyQueryData">搜索商品</el-button>
+            <el-button @click="getdata()">全部商品</el-button>
+        </div>
         <div class="table-wrap">
             <el-table
                     :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
@@ -56,7 +67,7 @@
                 <el-table-column
                         align="center"
                         prop="dec"
-                        label="商品描述">
+                        label="商品型号">
                 </el-table-column>
                 <el-table-column
                         align="center"
@@ -69,7 +80,8 @@
                         label="操作"
                         width="250">
                     <template slot-scope="scope">
-                        <el-button type="success" size="small" @click="showLibrary(scope.$index,scope.row)">查看</el-button>
+                        <el-button type="success" size="small" @click="showLibrary(scope.$index,scope.row)">查看
+                        </el-button>
                         <el-button type="primary" size="small" @click=" editInventory(scope.$index,scope.row)">编辑
                         </el-button>
                         <el-button type="danger" size="small" @click="deledata(scope.$index,scope.row)">删除</el-button>
@@ -183,28 +195,65 @@
                     num: '',
                     dec: '',
                     Remarks: '',
-                    barCode:''
+                    barCode: ''
                 },
                 formLabelWidth: '100px',
                 DataValue: '',
+                //表格数据
                 tableData: [],
+                //搜索用数据
+                restaurants: [],
+                //搜索框数据
+                searchNameState: '',
                 rowData: {},
                 rowDataValue: '',
                 isRouterAlive: true,
                 //分页初始页
-                currentPage:1,
+                currentPage: 1,
                 //分页每页数据
-                pagesize:10,
+                pagesize: 10,
 
             }
         },
         methods: {
+            //搜索框显示远程数据库数据
+            querySearchAsync(queryString, cb) {
+                let list = [];
+                this.axios.post('api/product/findData', {}).then((res) => {
+                    for (let item of res.data) {
+                        item.value = item.name
+                    }
+                    list = res.data;
+                    let results = queryString ? list.filter(this.createStateFilter(queryString)) : list;
+                    clearTimeout(this.timeout);
+                    this.timeout = setTimeout(() => {
+                        cb(results)
+                    }, 1000 * Math.random());
+
+                });
+            },
+            //搜索框过滤用函数
+            createStateFilter(queryString) {
+                return (state) => {
+                    return (state.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                };
+            },
+            //搜索框辅助函数 暂时没啥用
+            handleSelect(item) {
+                console.log(item);
+            },
+            searchProduct() {
+                this.getdata({
+                    "name": this.searchState
+                })
+            },
+
             //分页切换页码
-            handleCurrentChange(currentPage){
+            handleCurrentChange(currentPage) {
                 this.currentPage = currentPage;
             },
             //分页每页显示的数量
-            handleSizeChange(size){
+            handleSizeChange(size) {
                 this.pagesize = size
             },
             handleClose(done) {
@@ -216,8 +265,9 @@
                     });
             },
             //查找数据
-            getdata() {
-                this.axios.post('api/product/findData', {}).then((data) => {
+            getdata(obj) {
+                obj = obj || {};
+                this.axios.post('api/product/findData', obj).then((data) => {
                     this.tableData = data.data;
                     data.data.forEach((item, index) => {
                         if (item.date) {
@@ -234,6 +284,31 @@
                     //console.log(this.tableData)
                 }).catch(() => {
 
+                })
+            },
+
+            //商品名模糊查询
+
+            fuzzyQueryData() {
+                this.axios.post('api/product/fuzzyQueryData', {
+                    'name': this.searchNameState,
+                    'dec': this.searchNameState
+                }).then((data) => {
+                    this.tableData = data.data;
+                    data.data.forEach((item, index) => {
+                        if (item.date) {
+                            let date = new Date(parseInt(item.date));
+                            let Y = date.getFullYear() + '-';
+                            let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+                            let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate());
+                            let h = date.getHours() + ':';
+                            let m = date.getMinutes() + ':';
+                            let s = date.getSeconds();
+                            item.date = Y + M + D;
+                        }
+                    })
+                }).catch((error) => {
+                    console.log(error)
                 })
             },
             //提交新增数据
@@ -315,13 +390,13 @@
 
             },
             //跳转到查看详情页面
-            showLibrary(index,row) {
-                this.$store.commit('getProductId',row._id);
-                this.$router.push({path:'/library'})
+            showLibrary(index, row) {
+                this.$store.commit('getProductId', row._id);
+                this.$router.push({path: '/library'})
             }
         },
         mounted() {
-
+            // this.restaurants = this.tableData
         },
         created() {
             this.getdata()
@@ -358,6 +433,16 @@
             }
 
         }
+
+        /deep/ .main-search {
+            text-align: left;
+            margin: 10px 0;
+
+            .el-input {
+                width: 300px;
+            }
+        }
+
         .table-wrap {
             .el-table {
                 td {
@@ -380,6 +465,7 @@
                 padding: 30px 40px 30px 20px;
             }
         }
+
         .page {
             margin-top: 20px;
         }
