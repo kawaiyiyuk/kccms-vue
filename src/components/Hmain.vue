@@ -11,11 +11,11 @@
             <el-autocomplete
                     v-model="searchNameState"
                     :fetch-suggestions="querySearchAsync"
-                    placeholder="请输入商品名称"
+                    placeholder="请输入商品名称或者型号"
                     @select="handleSelect"
             ></el-autocomplete>
             <el-button @click="fuzzyQueryData">搜索商品</el-button>
-            <el-button @click="getdata()">全部商品</el-button>
+            <el-button type="info" @click="getdata()">显示全部商品</el-button>
         </div>
         <div class="table-wrap">
             <el-table
@@ -108,7 +108,7 @@
                 <el-form-item label="商品条形码" :label-width="formLabelWidth">
                     <el-input v-model="form.barCode"></el-input>
                 </el-form-item>
-                <el-form-item label="商品名称" :label-width="formLabelWidth">
+                <el-form-item label="商品名称" :label-width="formLabelWidth" >
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
                 <el-form-item label="商品价格" :label-width="formLabelWidth">
@@ -127,7 +127,7 @@
                         </el-date-picker>
                     </div>
                 </el-form-item>
-                <el-form-item label="商品描述" :label-width="formLabelWidth">
+                <el-form-item label="商品型号" :label-width="formLabelWidth">
                     <el-input v-model="form.dec"></el-input>
                 </el-form-item>
                 <el-form-item label="备注" :label-width="formLabelWidth">
@@ -166,7 +166,7 @@
                         </el-date-picker>
                     </div>
                 </el-form-item>
-                <el-form-item label="商品描述" :label-width="formLabelWidth">
+                <el-form-item label="商品型号" :label-width="formLabelWidth">
                     <el-input v-model="rowData.dec"></el-input>
                 </el-form-item>
                 <el-form-item label="备注" :label-width="formLabelWidth">
@@ -340,9 +340,9 @@
                         _id: row._id
                     }).then((data) => {
                         this.getdata()
-                        console.log('删除成功');
+                       // console.log('删除成功');
                     }).catch(() => {
-                        console.log('删除失败');
+                        //console.log('删除失败');
                     })
                     this.$message({
                         type: 'success',
@@ -382,7 +382,7 @@
                 this.editDialog = true;
                 this.axios.post('api/product/findData', {_id: row._id}).then((data) => {
                     this.rowData = data.data[0];
-                    console.log(data)
+                    //console.log(data)
                 })
                 // this.rowData = row;
                 // this.rowDataValue = new Date(row.date) ;
@@ -440,6 +440,9 @@
 
             .el-input {
                 width: 300px;
+            }
+            .el-button:nth-child(3) {
+                //margin-left: 100px;
             }
         }
 

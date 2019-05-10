@@ -38,8 +38,8 @@
                         </el-col>
                         <el-col :span="8">
                             <div class="grid-content bg-purple">
-                                <el-button type="success" @click="inlibraryDialog =true" >新增入库</el-button>
-                                <el-button type="success"@click="outlibraryDialog =true" >新增出库</el-button>
+                                <el-button type="success" @click="inlibraryDialog =true">新增入库</el-button>
+                                <el-button type="success" @click="outlibraryDialog =true">新增出库</el-button>
                             </div>
                         </el-col>
                     </el-row>
@@ -184,7 +184,8 @@
                                         <el-button type="primary" size="small"
                                                    @click=" editInventory(scope.$index,scope.row)">编辑
                                         </el-button>
-                                        <el-button type="danger" size="small" @click="deleoutdata(scope.$index,scope.row)">
+                                        <el-button type="danger" size="small"
+                                                   @click="deleoutdata(scope.$index,scope.row)">
                                             删除
                                         </el-button>
                                     </template>
@@ -303,7 +304,7 @@
                 //选显卡默认显示第一个
                 activeName: 'first',
                 //入库弹窗
-                inlibraryDialog:false,
+                inlibraryDialog: false,
                 //入库弹窗数据
                 forminlibrary: {
                     price: '',
@@ -311,11 +312,11 @@
                     dec: '',
                     Remarks: '',
                 },
-                formLabelWidth:'100px',
+                formLabelWidth: '100px',
                 //入库弹窗日期
-                DataValueInli:'',
+                DataValueInli: '',
                 //出库弹窗
-                outlibraryDialog:false,
+                outlibraryDialog: false,
                 //出库弹窗数据
                 formoutlibrary: {
                     price: '',
@@ -324,7 +325,7 @@
                     Remarks: '',
                 },
                 //入库弹窗日期
-                DataValueOutli:''
+                DataValueOutli: ''
             }
         },
         computed: {},
@@ -353,7 +354,7 @@
             },
             //获取出入库数据
             getData() {
-                 console.log(this.$store.state.productId)
+                //console.log(this.$store.state.productId)
                 this.axios.post('api/product/findData', {
                     //这个 id 是 ObejctID
                     _id: this.$store.state.productId
@@ -378,9 +379,9 @@
                 this.axios.post('api/library/findData', {
                     //这个 id 是生成数据库时自定义添加的不是 ObjectID
                     // id: "5cd197c896438e4c0d843358"
-                    id:this.$store.state.productId
+                    id: this.$store.state.productId
                 }).then((data) => {
-                    console.log(data)
+                    //console.log(data)
                     this.libraryData = data.data[0].inlibrary;
                     data.data[0].inlibrary.forEach((item, index) => {
                         if (item.date) {
@@ -504,7 +505,7 @@
                 //location.reload();
             },
             //出库按钮
-            OutFormpost () {
+            OutFormpost() {
                 this.formoutlibrary.date = this.DataValueOutli;
                 this.formoutlibrary.id = this.$store.state.productId;
                 this.axios.post('api/library/outData',
@@ -532,9 +533,7 @@
         created() {
             this.getData()
         },
-        filters: {
-
-        }
+        filters: {}
     }
 </script>
 
@@ -546,12 +545,14 @@
 
         .library-main {
             margin-top: 80px;
+
             /deep/ .library-btn-group {
                 position: absolute;
                 top: -30px;
                 right: 0;
                 z-index: 10;
             }
+
             .library-main-header {
                 width: 1200px;
                 margin: 0 auto 20px;
@@ -576,18 +577,22 @@
             margin-bottom: 20px;
         }
     }
+
     .add-dialog {
         .main-dialog {
             padding: 30px 40px 30px 20px;
         }
+
         .inlibrary-data {
             text-align: left;
         }
     }
+
     /deep/ .change-tip {
         width: 1200px;
         margin: 0 auto 0;
         position: relative;
+
         .el-tabs__header {
             margin-bottom: 1px;
             border-bottom: none;
