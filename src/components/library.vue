@@ -33,7 +33,7 @@
                         </el-col>
                         <el-col :span="8">
                             <div class="grid-content bg-purple">
-                                商品备注:{{tableData.Remarks}}
+                                商品型号:{{tableData.dec}}
                             </div>
                         </el-col>
                         <el-col :span="8">
@@ -89,7 +89,7 @@
                                 <el-table-column
                                         align="center"
                                         prop="dec"
-                                        label="商品描述">
+                                        label="商品型号">
                                 </el-table-column>
                                 <el-table-column
                                         align="center"
@@ -102,9 +102,9 @@
                                         label="操作"
                                         width="250">
                                     <template slot-scope="scope">
-                                        <el-button type="primary" size="small"
-                                                   @click=" editInventory(scope.$index,scope.row)">编辑
-                                        </el-button>
+                                        <!--<el-button type="primary" size="small"-->
+                                                   <!--@click=" editinLibrary(scope.$index,scope.row)">编辑-->
+                                        <!--</el-button>-->
                                         <el-button type="danger" size="small" @click="deledata(scope.$index,scope.row)">
                                             删除
                                         </el-button>
@@ -168,7 +168,7 @@
                                 <el-table-column
                                         align="center"
                                         prop="dec"
-                                        label="商品描述">
+                                        label="商品型号">
                                 </el-table-column>
                                 <el-table-column
                                         align="center"
@@ -181,9 +181,9 @@
                                         label="操作"
                                         width="250">
                                     <template slot-scope="scope">
-                                        <el-button type="primary" size="small"
-                                                   @click=" editInventory(scope.$index,scope.row)">编辑
-                                        </el-button>
+                                        <!--<el-button type="primary" size="small"-->
+                                                   <!--@click=" editInventory(scope.$index,scope.row)">编辑-->
+                                        <!--</el-button>-->
                                         <el-button type="danger" size="small"
                                                    @click="deleoutdata(scope.$index,scope.row)">
                                             删除
@@ -230,7 +230,7 @@
                         </el-date-picker>
                     </div>
                 </el-form-item>
-                <el-form-item label="商品描述" :label-width="formLabelWidth">
+                <el-form-item label="商品型号" :label-width="formLabelWidth">
                     <el-input v-model="forminlibrary.dec"></el-input>
                 </el-form-item>
                 <el-form-item label="备注" :label-width="formLabelWidth">
@@ -263,7 +263,7 @@
                         </el-date-picker>
                     </div>
                 </el-form-item>
-                <el-form-item label="商品描述" :label-width="formLabelWidth">
+                <el-form-item label="商品型号" :label-width="formLabelWidth">
                     <el-input v-model="formoutlibrary.dec"></el-input>
                 </el-form-item>
                 <el-form-item label="备注" :label-width="formLabelWidth">
@@ -452,7 +452,6 @@
 
             },
 
-
             //删除出库数据
             deleoutdata(index, row) {
 
@@ -490,7 +489,26 @@
 
             },
 
-            //入库按钮
+            //编辑入库信息
+            editinLibrary (index ,row) {
+                console.log(row)
+                let libry_id = row.libry_id;
+                //商品的 id
+                let product_id = this.$store.state.productId;
+                let user_id = this.$store.state.user_id.user_id;
+                let num = row.num;
+                this.axios.post('/api/library/editinlibrart',{
+                    product_id:product_id,
+                    user_id:user_id,
+                    data:row
+                }).then(() => {
+
+                }).catch ((err) => {
+                    console.log(err)
+                })
+            },
+
+            //新增入库
             InFormpost(type) {
                 this.forminlibrary.date = this.DataValueInli;
                 this.forminlibrary.product_id = this.$store.state.productId;
@@ -511,7 +529,7 @@
                 this.inlibraryDialog = false;
                 //location.reload();
             },
-            //出库按钮
+            //新增出库
             OutFormpost() {
                 this.formoutlibrary.date = this.DataValueOutli;
                 this.formoutlibrary.product_id = this.$store.state.productId;
