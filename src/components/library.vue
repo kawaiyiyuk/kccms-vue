@@ -103,7 +103,7 @@
                                         width="250">
                                     <template slot-scope="scope">
                                         <!--<el-button type="primary" size="small"-->
-                                                   <!--@click=" editinLibrary(scope.$index,scope.row)">编辑-->
+                                        <!--@click=" editinLibrary(scope.$index,scope.row)">编辑-->
                                         <!--</el-button>-->
                                         <el-button type="danger" size="small" @click="deledata(scope.$index,scope.row)">
                                             删除
@@ -182,7 +182,7 @@
                                         width="250">
                                     <template slot-scope="scope">
                                         <!--<el-button type="primary" size="small"-->
-                                                   <!--@click=" editInventory(scope.$index,scope.row)">编辑-->
+                                        <!--@click=" editInventory(scope.$index,scope.row)">编辑-->
                                         <!--</el-button>-->
                                         <el-button type="danger" size="small"
                                                    @click="deleoutdata(scope.$index,scope.row)">
@@ -212,13 +212,13 @@
         </div>
         <!--入库弹窗-->
         <el-dialog class="add-dialog" title="添加入库商品" :visible.sync="inlibraryDialog" :modal-append-to-body='false'>
-            <el-form :model="forminlibrary" class="main-dialog">
+            <el-form :model="forminlibrary" class="main-dialog" :rules="rules" ref="forminlibrary">
 
-                <el-form-item label="商品价格" :label-width="formLabelWidth">
-                    <el-input v-model="forminlibrary.price"></el-input>
+                <el-form-item label="商品价格" :label-width="formLabelWidth" prop="price">
+                    <el-input v-model.number="forminlibrary.price"></el-input>
                 </el-form-item>
-                <el-form-item label="商品数量" :label-width="formLabelWidth">
-                    <el-input v-model="forminlibrary.num"></el-input>
+                <el-form-item label="商品数量" :label-width="formLabelWidth" prop="num">
+                    <el-input v-model.number="forminlibrary.num"></el-input>
                 </el-form-item>
                 <el-form-item class="inlibrary-data" label="入库时间" :label-width="formLabelWidth">
                     <div class="block">
@@ -239,19 +239,19 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="inlibraryDialog = false">取 消</el-button>
-                <el-button type="primary" @click="InFormpost">确 定</el-button>
+                <el-button type="primary" @click="InFormpost('forminlibrary')">确 定</el-button>
             </div>
         </el-dialog>
 
         <!--出库弹窗-->
         <el-dialog class="add-dialog" title="添加出库商品" :visible.sync="outlibraryDialog" :modal-append-to-body='false'>
-            <el-form :model="formoutlibrary" class="main-dialog">
+            <el-form :model="formoutlibrary" class="main-dialog" :rules="rules" ref="formoutlibrary">
 
-                <el-form-item label="商品价格" :label-width="formLabelWidth">
-                    <el-input v-model="formoutlibrary.price"></el-input>
+                <el-form-item label="商品价格" :label-width="formLabelWidth" prop="price">
+                    <el-input v-model.number="formoutlibrary.price"></el-input>
                 </el-form-item>
-                <el-form-item label="商品数量" :label-width="formLabelWidth">
-                    <el-input v-model="formoutlibrary.num"></el-input>
+                <el-form-item label="商品数量" :label-width="formLabelWidth" prop="num">
+                    <el-input v-model.number="formoutlibrary.num"></el-input>
                 </el-form-item>
                 <el-form-item class="inlibrary-data" label="出库时间" :label-width="formLabelWidth">
                     <div class="block">
@@ -272,7 +272,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="outlibraryDialog = false">取 消</el-button>
-                <el-button type="primary" @click="OutFormpost">确 定</el-button>
+                <el-button type="primary" @click="OutFormpost('formoutlibrary')">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -309,7 +309,7 @@
                 //入库弹窗数据
                 forminlibrary: {
                     price: '',
-                    num: '',
+                    num: 0,
                     dec: '',
                     Remarks: '',
                 },
@@ -326,7 +326,20 @@
                     Remarks: '',
                 },
                 //入库弹窗日期
-                DataValueOutli: ''
+                DataValueOutli: '',
+                rules: {
+                    name: [
+                        {required: true, message: '请输入活动名称', trigger: 'blur'}
+                    ],
+                    price: [
+                        {type: 'number', message: '价格必须为数字', trigger: 'blur'}
+                    ],
+                    num: [
+                        {required: true, message: '数量不能为空', trigger: 'blur'},
+                        {type: 'number', message: '数量必须为数字', trigger: 'blur'}
+                    ]
+                }
+
             }
         },
         computed: {},
@@ -429,7 +442,7 @@
                     type: 'warning'
                 }).then(() => {
                     this.axios.post('http://127.0.0.1:3000/library/deleteinlibrary', {
-                        user_id:user_id,
+                        user_id: user_id,
                         product_id: product_id,
                         libry_id: libry_id,
                         num: num
@@ -468,7 +481,7 @@
                     this.axios.post('http://127.0.0.1:3000/library/deleteoutlibrary', {
                         libry_id: libry_id,
                         product_id: product_id,
-                        user_id:user_id,
+                        user_id: user_id,
                         num: num
                     }).then(() => {
                         this.getData()
@@ -490,63 +503,77 @@
             },
 
             //编辑入库信息
-            editinLibrary (index ,row) {
+            editinLibrary(index, row) {
                 console.log(row)
                 let libry_id = row.libry_id;
                 //商品的 id
                 let product_id = this.$store.state.productId;
                 let user_id = this.$store.state.user_id.user_id;
                 let num = row.num;
-                this.axios.post('/api/library/editinlibrart',{
-                    product_id:product_id,
-                    user_id:user_id,
-                    data:row
+                this.axios.post('/api/library/editinlibrart', {
+                    product_id: product_id,
+                    user_id: user_id,
+                    data: row
                 }).then(() => {
 
-                }).catch ((err) => {
+                }).catch((err) => {
                     console.log(err)
                 })
             },
 
             //新增入库
-            InFormpost(type) {
-                this.forminlibrary.date = this.DataValueInli;
-                this.forminlibrary.product_id = this.$store.state.productId;
-                this.forminlibrary.user_id = this.$store.state.user_id.user_id;
-                this.axios.post('api/library/addData',
-                    this.forminlibrary
-                ).then((data) => {
-                    // console.log( this.forminlibrary)
-                    this.$message({
-                        type: 'success',
-                        dangerouslyUseHTMLString: true,
-                        message: '<strong>添加成功</strong>'
-                    });
-                    this.getData()
-                }).catch(() => {
+            InFormpost(forminlibrary) {
+                this.$refs[forminlibrary].validate((valid) => {
+                    if (valid) {
+                        this.forminlibrary.date = this.DataValueInli;
+                        this.forminlibrary.product_id = this.$store.state.productId;
+                        this.forminlibrary.user_id = this.$store.state.user_id.user_id;
+                        this.axios.post('api/library/addData',
+                            this.forminlibrary
+                        ).then((data) => {
+                            // console.log( this.forminlibrary)
+                            this.$message({
+                                type: 'success',
+                                dangerouslyUseHTMLString: true,
+                                message: '<strong>添加成功</strong>'
+                            });
+                            this.getData()
+                        }).catch(() => {
 
+                        });
+                        this.inlibraryDialog = false;
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
                 });
-                this.inlibraryDialog = false;
-                //location.reload();
             },
             //新增出库
-            OutFormpost() {
+            OutFormpost(OutFormpost) {
                 this.formoutlibrary.date = this.DataValueOutli;
                 this.formoutlibrary.product_id = this.$store.state.productId;
-                this.formoutlibrary.user_id = this.$store.state.user.user_id;
-                this.axios.post('api/library/outData',
-                    this.formoutlibrary
-                ).then((data) => {
-                    this.$message({
-                        type: 'success',
-                        dangerouslyUseHTMLString: true,
-                        message: '<strong>添加成功</strong>'
-                    });
-                    this.getData()
-                }).catch(() => {
+                this.formoutlibrary.user_id = this.$store.state.user_id.user_id;
+                this.$refs[OutFormpost].validate((valid) => {
+                    if (valid) {
+                        this.axios.post('api/library/outData',
+                            this.formoutlibrary
+                        ).then((data) => {
+                            this.$message({
+                                type: 'success',
+                                dangerouslyUseHTMLString: true,
+                                message: '<strong>添加成功</strong>'
+                            });
+                            this.getData()
+                        }).catch(() => {
 
+                        });
+                        this.outlibraryDialog = false;
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
                 });
-                this.outlibraryDialog = false;
+
                 //location.reload();
             }
         },

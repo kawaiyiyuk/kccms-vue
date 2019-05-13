@@ -104,18 +104,18 @@
 
         <!--新增库存弹窗-->
         <el-dialog class="add-dialog" title="添加库存商品" :visible.sync="addDialog" :modal-append-to-body='false'>
-            <el-form :model="form" class="main-dialog">
+            <el-form :model="form" class="main-dialog" :rules="rules" ref="form">
                 <el-form-item label="商品条形码" :label-width="formLabelWidth">
                     <el-input v-model="form.barCode"></el-input>
                 </el-form-item>
-                <el-form-item label="商品名称" :label-width="formLabelWidth" >
+                <el-form-item label="商品名称" :label-width="formLabelWidth" prop="name">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item label="商品价格" :label-width="formLabelWidth">
-                    <el-input v-model="form.price"></el-input>
+                <el-form-item label="商品价格" :label-width="formLabelWidth" prop="price">
+                    <el-input v-model.number="form.price"></el-input>
                 </el-form-item>
-                <el-form-item label="商品数量" :label-width="formLabelWidth">
-                    <el-input v-model="form.num"></el-input>
+                <el-form-item label="商品数量" :label-width="formLabelWidth" prop="num">
+                    <el-input v-model.number="form.num"></el-input>
                 </el-form-item>
                 <el-form-item class="inlibrary-data" label="入库时间" :label-width="formLabelWidth">
                     <div class="block">
@@ -136,25 +136,25 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="addDialog = false">取 消</el-button>
-                <el-button type="primary" @click="Formpost">确 定</el-button>
+                <el-button type="primary" @click="Formpost('form')">确 定</el-button>
             </div>
         </el-dialog>
 
 
         <!--编辑库存弹窗-->
         <el-dialog class="add-dialog" title="编辑库存商品" :visible.sync="editDialog" :modal-append-to-body='false'>
-            <el-form :model="rowData" class="main-dialog">
+            <el-form :model="rowData" class="main-dialog" :rules="rules" ref="rowData">
                 <el-form-item label="商品条形码" :label-width="formLabelWidth">
                     <el-input v-model="rowData.barCode"></el-input>
                 </el-form-item>
-                <el-form-item label="商品名称" :label-width="formLabelWidth">
+                <el-form-item label="商品名称" :label-width="formLabelWidth" prop="name">
                     <el-input v-model="rowData.name"></el-input>
                 </el-form-item>
-                <el-form-item label="商品价格" :label-width="formLabelWidth">
-                    <el-input v-model="rowData.price"></el-input>
+                <el-form-item label="商品价格" :label-width="formLabelWidth" prop="price">
+                    <el-input v-model.number="rowData.price"></el-input>
                 </el-form-item>
-                <el-form-item label="商品数量" :label-width="formLabelWidth">
-                    <el-input v-model="rowData.num"></el-input>
+                <el-form-item label="商品数量" :label-width="formLabelWidth" prop="num">
+                    <el-input v-model.num="rowData.num"></el-input>
                 </el-form-item>
                 <el-form-item class="inlibrary-data" label="入库时间" :label-width="formLabelWidth">
                     <div class="block">
@@ -175,7 +175,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="editDialog = false">取 消</el-button>
-                <el-button type="primary" @click="dataEdit()">确 定</el-button>
+                <el-button type="primary" @click="dataEdit('rowData')">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -187,12 +187,12 @@
         name: "Hmain",
         data() {
             return {
-                user_id:'',
+                user_id: '',
                 addDialog: false,
                 editDialog: false,
                 form: {
                     name: '',
-                    price: '',
+                    price: 0,
                     num: '',
                     dec: '',
                     Remarks: '',
@@ -206,22 +206,56 @@
                 restaurants: [],
                 //搜索框数据
                 searchNameState: '',
-                rowData: {},
+                rowData: {
+                    name: '',
+                    price: 0,
+                    num: '',
+                    dec: '',
+                    Remarks: '',
+                    barCode: ''
+                },
                 rowDataValue: '',
                 isRouterAlive: true,
                 //分页初始页
                 currentPage: 1,
                 //分页每页数据
                 pagesize: 10,
+                rules: {
+                    name: [
+                        {required: true, message: '请输入活动名称', trigger: 'blur'}
+                    ],
+                    price: [
+                        {type: 'number', message: '价格必须为数字', trigger: 'blur'}
+                    ],
+                    num: [
+                        {required: true, message: '数量不能为空', trigger: 'blur'},
+                        {type: 'number', message: '数量必须为数字', trigger: 'blur'}
+                    ]
+                }
 
             }
         },
         methods: {
+            // submitForm(form) {
+            //     this.$refs[form].validate((valid) => {
+            //         if (valid) {
+            //             alert('submit!');
+            //         } else {
+            //             console.log('error submit!!');
+            //             return false;
+            //         }
+            //     });
+            // },
+            // resetForm(formName) {
+            //     this.$refs[formName].resetFields();
+            // },
+
+
             //搜索框显示远程数据库数据
             querySearchAsync(queryString, cb) {
                 let list = [];
                 this.axios.post('api/product/findData', {
-                    user_id:this.$store.state.user_id.user_id
+                    user_id: this.$store.state.user_id.user_id
                 }).then((res) => {
                     let data = res.data.productList.products
                     // console.log(res);
@@ -299,8 +333,8 @@
                 this.axios.post('api/product/fuzzyQueryData', {
                     'name': this.searchNameState,
                     'dec': this.searchNameState,
-                    'user_id':this.$store.state.user_id.user_id,
-                    'product_id':this.$store.state.user_id.user_id,
+                    'user_id': this.$store.state.user_id.user_id,
+                    'product_id': this.$store.state.user_id.user_id,
 
                 }).then((data) => {
                     this.tableData = data.data;
@@ -321,20 +355,28 @@
                 })
             },
             //提交新增数据
-            Formpost(type) {
-                this.form.date = this.DataValue;
-                this.form.user_id = this.user_id;
-                this.axios.post('api/product/addData',
-                    this.form
-                ).then((data) => {
-                    this.$message({
-                        type: 'success',
-                        dangerouslyUseHTMLString: true,
-                        message: '<strong>添加成功</strong>'
-                    });
-                    this.getdata()
-                }).catch(() => {
+            Formpost(form) {
 
+                this.$refs[form].validate((valid) => {
+                    if (valid) {
+                        this.form.date = this.DataValue;
+                        this.form.user_id = this.user_id;
+                        this.axios.post('api/product/addData',
+                            this.form
+                        ).then((data) => {
+                            this.$message({
+                                type: 'success',
+                                dangerouslyUseHTMLString: true,
+                                message: '<strong>添加成功</strong>'
+                            });
+                            this.getdata()
+                        }).catch(() => {
+
+                        });
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
                 });
                 this.addDialog = false;
             },
@@ -347,11 +389,11 @@
                     type: 'warning'
                 }).then(() => {
                     this.axios.post('api/product/deleteData', {
-                        product_id:row.product_id,
+                        product_id: row.product_id,
                         user_id: user_id
                     }).then(() => {
                         this.getdata()
-                       // console.log('删除成功');
+                        // console.log('删除成功');
                     }).catch(() => {
                         //console.log('删除失败');
                     })
@@ -369,32 +411,37 @@
             },
 
             //编辑库存信息
-            dataEdit() {
-                this.axios.post('api/product/updateData',
-                    this.rowData
-                ).then((data) => {
-                    console.log(this.rowData)
-                    this.$message({
-                        type: 'success',
-                        dangerouslyUseHTMLString: true,
-                        message: '<strong>修改成功</strong>'
-                    });
-                }).catch(() => {
+            dataEdit(rowData) {
+                this.$refs[rowData].validate((valid) => {
+                    if (valid) {
+                        this.axios.post('api/product/updateData',
+                            this.rowData
+                        ).then((data) => {
+                            this.editDialog = false;
+                            this.$message({
+                                type: 'success',
+                                dangerouslyUseHTMLString: true,
+                                message: '<strong>修改成功</strong>'
+                            });
+                            this.getdata()
+                        }).catch(() => {
 
+                        });
+
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
                 });
-                this.editDialog = false;
-                // location.reload();
-                this.getdata()
+
             },
             editInventory(index, row) {
                 this.editDialog = true;
                 this.axios.post('api/product/findData', {
-                    user_id:this.$store.state.user_id.user_id,
+                    user_id: this.$store.state.user_id.user_id,
                     product_id: row.product_id,
-                    status:2
+                    status: 2
                 }).then((data) => {
-
-                    console.log(data)
                     this.rowData = data.data.product;
                     //console.log(data)
                 })
@@ -458,6 +505,7 @@
             .el-input {
                 width: 300px;
             }
+
             .el-button:nth-child(3) {
                 //margin-left: 100px;
             }

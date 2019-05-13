@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import Home from '@/components/Home'
 import library from '@/components/library'
 import Login from '@/components/login'
+
 Vue.use(Router)
 
 export default new Router({
