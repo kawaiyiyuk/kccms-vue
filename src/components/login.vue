@@ -73,8 +73,8 @@
                                 dangerouslyUseHTMLString: true,
                                 message: '<strong>登录成功</strong>'
                             });
-
-                            this.$store.commit('$_setStorage', {user: data.data.item[0].username})
+                            console.log(data.data.item[0])
+                            this.$store.commit('$_setStorage', {user: data.data.item[0].username,user_id: data.data.item[0]._id});
                             this.$store.commit('$_setLogin', '1')
                             this.$router.push({name: 'Home'})
                             this.$router.push('/home')

@@ -8,32 +8,32 @@
                     <el-row :gutter="20">
                         <el-col :span="8">
                             <div class="grid-content bg-purple">
-                                商品名称 : {{tableData[0].name}}
+                                商品名称 : {{tableData.name}}
                             </div>
                         </el-col>
                         <el-col :span="8">
                             <div class="grid-content bg-purple">
-                                条形码:{{tableData[0].barCode}}
+                                条形码:{{tableData.barCode}}
                             </div>
                         </el-col>
                         <el-col :span="8">
                             <div class="grid-content bg-purple">
-                                剩余库存:{{tableData[0].num}}
+                                剩余库存:{{tableData.num}}
                             </div>
                         </el-col>
                         <el-col :span="8">
                             <div class="grid-content bg-purple">
-                                商品单价:{{tableData[0].price|currency}}
+                                商品单价:{{tableData.price|currency}}
                             </div>
                         </el-col>
                         <el-col :span="8">
                             <div class="grid-content bg-purple">
-                                入库时间:{{tableData[0].date}}
+                                入库时间:{{tableData.date}}
                             </div>
                         </el-col>
                         <el-col :span="8">
                             <div class="grid-content bg-purple">
-                                商品备注:{{tableData[0].Remarks}}
+                                商品备注:{{tableData.Remarks}}
                             </div>
                         </el-col>
                         <el-col :span="8">
@@ -286,6 +286,7 @@
         name: "library",
         data() {
             return {
+                user_id: '',
                 library: 111,
                 //入库分页初始页
                 currentPagein: 1,
@@ -354,36 +355,35 @@
             },
             //获取出入库数据
             getData() {
-                //console.log(this.$store.state.productId)
-                this.axios.post('api/product/findData', {
-                    //这个 id 是 ObejctID
-                    _id: this.$store.state.productId
+                //获取商品数据库
+                let obj = {};
+                obj.user_id = this.user_id;
+                // console.log(this.$store.state.productId)
+                this.axios.post('api/product/findLibrData', {
+                    product_id: this.$store.state.productId
                 }).then((data) => {
-                    this.tableData = data.data;
-                    data.data.forEach((item, index) => {
-                        if (item.date) {
-                            let date = new Date(parseInt(item.date));
-                            let Y = date.getFullYear() + '-';
-                            let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
-                            let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate());
-                            let h = date.getHours() + ':';
-                            let m = date.getMinutes() + ':';
-                            let s = date.getSeconds();
-                            item.date = Y + M + D;
-                        }
-                    })
+                    this.tableData = data.data.item;
+                    if (data.data.item.date) {
+                        let date = new Date(parseInt(data.data.item.date));
+                        let Y = date.getFullYear() + '-';
+                        let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+                        let D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate());
+                        let h = date.getHours() + ':';
+                        let m = date.getMinutes() + ':';
+                        let s = date.getSeconds();
+                        data.data.item.date = Y + M + D;
+                    }
                 }).catch((error) => {
                     console.log(error)
                 })
 
                 this.axios.post('api/library/findData', {
-                    //这个 id 是生成数据库时自定义添加的不是 ObjectID
-                    // id: "5cd197c896438e4c0d843358"
-                    id: this.$store.state.productId
+                    user_id: this.user_id,
+                    product_id: this.$store.state.productId
                 }).then((data) => {
-                    //console.log(data)
-                    this.libraryData = data.data[0].inlibrary;
-                    data.data[0].inlibrary.forEach((item, index) => {
+                    // console.log(data)
+                    this.libraryData = data.data.item.inlibrary;
+                    data.data.item.inlibrary.forEach((item, index) => {
                         if (item.date) {
                             let date = new Date(parseInt(item.date));
                             let Y = date.getFullYear() + '-';
@@ -396,8 +396,8 @@
                         }
                     });
 
-                    this.libraryoutData = data.data[0].outlibrary;
-                    data.data[0].outlibrary.forEach((item, index) => {
+                    this.libraryoutData = data.data.item.outlibrary;
+                    data.data.item.outlibrary.forEach((item, index) => {
                         if (item.date) {
                             let date = new Date(parseInt(item.date));
                             let Y = date.getFullYear() + '-';
@@ -417,9 +417,11 @@
             //删除入库数据
             deledata(index, row) {
                 //入库数据的 id
-                let libid = row.libid;
+                console.log(row)
+                let libry_id = row.libry_id;
                 //商品的 id
-                let id = this.$store.state.productId;
+                let product_id = this.$store.state.productId;
+                let user_id = this.$store.state.user_id.user_id;
                 let num = row.num;
                 this.$confirm('此操作将永久删除该库存, 是否继续?', '提示', {
                     confirmButtonText: '确定',
@@ -427,8 +429,9 @@
                     type: 'warning'
                 }).then(() => {
                     this.axios.post('http://127.0.0.1:3000/library/deleteinlibrary', {
-                        id: id,
-                        libid: libid,
+                        user_id:user_id,
+                        product_id: product_id,
+                        libry_id: libry_id,
                         num: num
                     }).then(() => {
                         this.getData()
@@ -452,10 +455,11 @@
 
             //删除出库数据
             deleoutdata(index, row) {
-                //入库数据的 id
-                let libid = row.libid;
+
+                let libry_id = row.libry_id;
                 //商品的 id
-                let id = this.$store.state.productId;
+                let product_id = this.$store.state.productId;
+                let user_id = this.$store.state.user_id.user_id;
                 let num = row.num;
                 this.$confirm('此操作将永久删除该库存, 是否继续?', '提示', {
                     confirmButtonText: '确定',
@@ -463,8 +467,9 @@
                     type: 'warning'
                 }).then(() => {
                     this.axios.post('http://127.0.0.1:3000/library/deleteoutlibrary', {
-                        id: id,
-                        libid: libid,
+                        libry_id: libry_id,
+                        product_id: product_id,
+                        user_id:user_id,
                         num: num
                     }).then(() => {
                         this.getData()
@@ -488,10 +493,12 @@
             //入库按钮
             InFormpost(type) {
                 this.forminlibrary.date = this.DataValueInli;
-                this.forminlibrary.id = this.$store.state.productId;
+                this.forminlibrary.product_id = this.$store.state.productId;
+                this.forminlibrary.user_id = this.$store.state.user_id.user_id;
                 this.axios.post('api/library/addData',
                     this.forminlibrary
                 ).then((data) => {
+                    // console.log( this.forminlibrary)
                     this.$message({
                         type: 'success',
                         dangerouslyUseHTMLString: true,
@@ -507,7 +514,8 @@
             //出库按钮
             OutFormpost() {
                 this.formoutlibrary.date = this.DataValueOutli;
-                this.formoutlibrary.id = this.$store.state.productId;
+                this.formoutlibrary.product_id = this.$store.state.productId;
+                this.formoutlibrary.user_id = this.$store.state.user.user_id;
                 this.axios.post('api/library/outData',
                     this.formoutlibrary
                 ).then((data) => {
@@ -531,6 +539,7 @@
             //this.$store.commit('getProductId',)
         },
         created() {
+            this.user_id = JSON.parse(localStorage.getItem('key')).user_id
             this.getData()
         },
         filters: {}

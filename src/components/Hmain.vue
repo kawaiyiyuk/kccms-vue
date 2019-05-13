@@ -187,6 +187,7 @@
         name: "Hmain",
         data() {
             return {
+                user_id:'',
                 addDialog: false,
                 editDialog: false,
                 form: {
@@ -219,11 +220,15 @@
             //搜索框显示远程数据库数据
             querySearchAsync(queryString, cb) {
                 let list = [];
-                this.axios.post('api/product/findData', {}).then((res) => {
-                    for (let item of res.data) {
+                this.axios.post('api/product/findData', {
+                    user_id:this.$store.state.user_id.user_id
+                }).then((res) => {
+                    let data = res.data.productList.products
+                    // console.log(res);
+                    for (let item of data) {
                         item.value = item.name
                     }
-                    list = res.data;
+                    list = data;
                     let results = queryString ? list.filter(this.createStateFilter(queryString)) : list;
                     clearTimeout(this.timeout);
                     this.timeout = setTimeout(() => {
@@ -265,11 +270,13 @@
                     });
             },
             //查找数据
-            getdata(obj) {
-                obj = obj || {};
+            getdata() {
+                let obj = {};
+                obj.user_id = this.user_id;
                 this.axios.post('api/product/findData', obj).then((data) => {
-                    this.tableData = data.data;
-                    data.data.forEach((item, index) => {
+                    // console.log(data);
+                    this.tableData = data.data.productList.products;
+                    data.data.productList.products.forEach((item, index) => {
                         if (item.date) {
                             let date = new Date(parseInt(item.date));
                             let Y = date.getFullYear() + '-';
@@ -288,11 +295,13 @@
             },
 
             //商品名模糊查询
-
             fuzzyQueryData() {
                 this.axios.post('api/product/fuzzyQueryData', {
                     'name': this.searchNameState,
-                    'dec': this.searchNameState
+                    'dec': this.searchNameState,
+                    'user_id':this.$store.state.user_id.user_id,
+                    'product_id':this.$store.state.user_id.user_id,
+
                 }).then((data) => {
                     this.tableData = data.data;
                     data.data.forEach((item, index) => {
@@ -314,6 +323,7 @@
             //提交新增数据
             Formpost(type) {
                 this.form.date = this.DataValue;
+                this.form.user_id = this.user_id;
                 this.axios.post('api/product/addData',
                     this.form
                 ).then((data) => {
@@ -327,18 +337,19 @@
 
                 });
                 this.addDialog = false;
-                //location.reload();
             },
             //删除数据
             deledata(index, row) {
+                let user_id = this.$store.state.user_id.user_id;
                 this.$confirm('此操作将永久删除该库存, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
                     this.axios.post('api/product/deleteData', {
-                        _id: row._id
-                    }).then((data) => {
+                        product_id:row.product_id,
+                        user_id: user_id
+                    }).then(() => {
                         this.getdata()
                        // console.log('删除成功');
                     }).catch(() => {
@@ -348,16 +359,13 @@
                         type: 'success',
                         message: '删除成功!'
                     });
-                }).catch(() => {
+                }).catch((err) => {
+                    console.log(err)
                     this.$message({
                         type: 'info',
                         message: '已取消删除'
                     });
                 });
-
-
-                //console.log(index, row);
-
             },
 
             //编辑库存信息
@@ -365,7 +373,7 @@
                 this.axios.post('api/product/updateData',
                     this.rowData
                 ).then((data) => {
-                    //console.log(this.rowData)
+                    console.log(this.rowData)
                     this.$message({
                         type: 'success',
                         dangerouslyUseHTMLString: true,
@@ -380,8 +388,14 @@
             },
             editInventory(index, row) {
                 this.editDialog = true;
-                this.axios.post('api/product/findData', {_id: row._id}).then((data) => {
-                    this.rowData = data.data[0];
+                this.axios.post('api/product/findData', {
+                    user_id:this.$store.state.user_id.user_id,
+                    product_id: row.product_id,
+                    status:2
+                }).then((data) => {
+
+                    console.log(data)
+                    this.rowData = data.data.product;
                     //console.log(data)
                 })
                 // this.rowData = row;
@@ -391,7 +405,8 @@
             },
             //跳转到查看详情页面
             showLibrary(index, row) {
-                this.$store.commit('getProductId', row._id);
+                // console.log(row)
+                this.$store.commit('getProductId', row.product_id);
                 this.$router.push({path: '/library'})
             }
         },
@@ -399,7 +414,9 @@
             // this.restaurants = this.tableData
         },
         created() {
-            this.getdata()
+            this.user_id = JSON.parse(localStorage.getItem('key')).user_id
+            this.getdata();
+
         },
         filters: {
             // currency (num) {

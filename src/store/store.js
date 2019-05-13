@@ -11,6 +11,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         productId: localStorage.getItem("productId") || '',
+        user_id:  JSON.parse(localStorage.getItem('key'))  || '',
         isLogin: false,
         user: null,
     },
