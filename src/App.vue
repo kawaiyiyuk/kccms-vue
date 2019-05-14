@@ -32,7 +32,7 @@ export default {
 <style>
   @import "./assets/css/global.css";  /*引入公共 css*/
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family:"Microsoft YaHei", 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

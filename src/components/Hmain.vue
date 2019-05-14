@@ -383,7 +383,7 @@
             //删除数据
             deledata(index, row) {
                 let user_id = this.$store.state.user_id.user_id;
-                this.$confirm('此操作将永久删除该库存, 是否继续?', '提示', {
+                this.$confirm('将永久删除该商品以及该商品的库存信息, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
@@ -412,6 +412,7 @@
 
             //编辑库存信息
             dataEdit(rowData) {
+                this.rowData.user_id = this.$store.state.user_id.user_id;
                 this.$refs[rowData].validate((valid) => {
                     if (valid) {
                         this.axios.post('api/product/updateData',
