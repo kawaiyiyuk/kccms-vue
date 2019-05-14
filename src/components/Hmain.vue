@@ -48,14 +48,14 @@
                 <el-table-column
                         align="center"
                         prop="num"
-                        label="数量"
+                        label="库存剩余"
                         width="80">
                 </el-table-column>
                 <el-table-column
                         align="center"
                         prop="date"
                         width="130"
-                        label="入库时间">
+                        label="添加时间">
                 </el-table-column>
                 <el-table-column
                         align="center"
@@ -279,7 +279,7 @@
             },
             //搜索框辅助函数 暂时没啥用
             handleSelect(item) {
-                console.log(item);
+                // console.log(item);
             },
             searchProduct() {
                 this.getdata({
