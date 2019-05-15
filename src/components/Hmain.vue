@@ -51,8 +51,6 @@
                         align="center"
                         prop="num"
                         label="库存剩余"
-<<<<<<< HEAD
-=======
                         width="80">
                 </el-table-column>
                 <el-table-column
@@ -60,7 +58,6 @@
                         align="center"
                         prop="minnum"
                         label="最低库存"
->>>>>>> librarylist
                         width="80">
                 </el-table-column>
                 <el-table-column

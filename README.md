@@ -1,6 +1,8 @@
-# vuepro
+# kccms-vue
 
-> A Vue.js project
+> 基于 vue 和 element UI 的一个 cms 库存系统
+
+### 服务端系统用的是 node 和 mogodb 构建 目前只能在本地访问 线上的测试数据库还没有放上
 
 ## Build Setup
 
