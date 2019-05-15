@@ -64,6 +64,12 @@
                                     </template>
                                 </el-table-column>
                                 <el-table-column
+                                        v-if="false"
+                                        align="center"
+                                        prop="name"
+                                        label="商品名称">
+                                </el-table-column>
+                                <el-table-column
                                         align="center"
                                         prop="date"
                                         label="入库时间"
@@ -96,6 +102,7 @@
                                         prop="Remarks"
                                         label="备注信息">
                                 </el-table-column>
+
                                 <el-table-column
                                         align="center"
                                         fixed="right"
@@ -213,7 +220,9 @@
         <!--入库弹窗-->
         <el-dialog class="add-dialog" title="添加入库商品" :visible.sync="inlibraryDialog" :modal-append-to-body='false'>
             <el-form :model="forminlibrary" class="main-dialog" :rules="rules" ref="forminlibrary">
-
+                <el-form-item label="商品名称" :label-width="formLabelWidth" prop="price">
+                    <el-input v-model="tableData.name" :disabled="true"></el-input>
+                </el-form-item>
                 <el-form-item label="商品价格" :label-width="formLabelWidth" prop="price">
                     <el-input v-model.number="forminlibrary.price"></el-input>
                 </el-form-item>
@@ -301,13 +310,16 @@
                 //出库表格数据
                 libraryoutData: [],
                 //商品信息
-                tableData: null,
+                tableData: {
+                    name:null
+                },
                 //选显卡默认显示第一个
                 activeName: 'first',
                 //入库弹窗
                 inlibraryDialog: false,
                 //入库弹窗数据
                 forminlibrary: {
+                    name:'',
                     price: '',
                     num: 0,
                     dec: '',
@@ -528,6 +540,7 @@
                         this.forminlibrary.date = this.DataValueInli;
                         this.forminlibrary.product_id = this.$store.state.productId;
                         this.forminlibrary.user_id = this.$store.state.user_id.user_id;
+                        this.forminlibrary.name = this.tableData.name;
                         this.axios.post('api/library/addData',
                             this.forminlibrary
                         ).then((data) => {

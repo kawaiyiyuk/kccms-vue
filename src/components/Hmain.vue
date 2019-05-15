@@ -3,7 +3,7 @@
         <el-row class="main-header">
             <div class="main">
                 <!--<el-button type="primary">新增库存</el-button>-->
-                <el-button type="success" @click=" addDialog = true">新增库存</el-button>
+                <el-button type="success" @click=" addDialog = true">新增商品</el-button>
             </div>
         </el-row>
 
@@ -21,6 +21,8 @@
             <el-table
                     :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
                     border
+                    :row-class-name="tableRowClassName"
+                    :cell-class-name="rowClass"
                     class="main-table"
                     style="width: 100%"><!--:data 是分页的重点-->
                 <el-table-column
@@ -49,6 +51,16 @@
                         align="center"
                         prop="num"
                         label="库存剩余"
+<<<<<<< HEAD
+=======
+                        width="80">
+                </el-table-column>
+                <el-table-column
+                        v-if="false"
+                        align="center"
+                        prop="minnum"
+                        label="最低库存"
+>>>>>>> librarylist
                         width="80">
                 </el-table-column>
                 <el-table-column
@@ -78,8 +90,9 @@
                         align="center"
                         fixed="right"
                         label="操作"
-                        width="250">
-                    <template slot-scope="scope">
+                        width="250"
+                        >
+                    <template slot-scope="scope" class="not-min-num">
                         <el-button type="success" size="small" @click="showLibrary(scope.$index,scope.row)">查看
                         </el-button>
                         <el-button type="primary" size="small" @click=" editInventory(scope.$index,scope.row)">编辑
@@ -105,7 +118,7 @@
         <!--新增库存弹窗-->
         <el-dialog class="add-dialog" title="添加库存商品" :visible.sync="addDialog" :modal-append-to-body='false'>
             <el-form :model="form" class="main-dialog" :rules="rules" ref="form">
-                <el-form-item label="商品条形码" :label-width="formLabelWidth">
+                <el-form-item  label="商品条形码" :label-width="formLabelWidth">
                     <el-input v-model="form.barCode"></el-input>
                 </el-form-item>
                 <el-form-item label="商品名称" :label-width="formLabelWidth" prop="name">
@@ -114,8 +127,11 @@
                 <el-form-item label="商品价格" :label-width="formLabelWidth" prop="price">
                     <el-input v-model.number="form.price"></el-input>
                 </el-form-item>
-                <el-form-item label="商品数量" :label-width="formLabelWidth" prop="num">
-                    <el-input v-model.number="form.num"></el-input>
+                <!--<el-form-item label="商品数量" :label-width="formLabelWidth" prop="num">-->
+                    <!--<el-input v-model.number="form.num"></el-input>-->
+                <!--</el-form-item>-->
+                <el-form-item  label="最低库存" :label-width="formLabelWidth">
+                <el-input v-model="form.num"></el-input>
                 </el-form-item>
                 <el-form-item class="inlibrary-data" label="入库时间" :label-width="formLabelWidth">
                     <div class="block">
@@ -153,8 +169,14 @@
                 <el-form-item label="商品价格" :label-width="formLabelWidth" prop="price">
                     <el-input v-model.number="rowData.price"></el-input>
                 </el-form-item>
-                <el-form-item label="商品数量" :label-width="formLabelWidth" prop="num">
-                    <el-input v-model.num="rowData.num"></el-input>
+                <!--<el-form-item label="商品数量" :label-width="formLabelWidth" prop="num">-->
+                    <!--<el-input v-model.num="rowData.num"></el-input>-->
+                <!--</el-form-item>-->
+                <el-form-item label="最低库存" :label-width="formLabelWidth" >
+                    <el-input v-model="rowData.minnum"></el-input>
+                </el-form-item>
+                <el-form-item label="商品数量" :label-width="formLabelWidth" >
+                        <el-input v-model="rowData.num"></el-input>
                 </el-form-item>
                 <el-form-item class="inlibrary-data" label="入库时间" :label-width="formLabelWidth">
                     <div class="block">
@@ -194,6 +216,7 @@
                     name: '',
                     price: 0,
                     num: '',
+                    minnum:100,
                     dec: '',
                     Remarks: '',
                     barCode: ''
@@ -227,10 +250,10 @@
                     price: [
                         {type: 'number', message: '价格必须为数字', trigger: 'blur'}
                     ],
-                    num: [
-                        {required: true, message: '数量不能为空', trigger: 'blur'},
-                        {type: 'number', message: '数量必须为数字', trigger: 'blur'}
-                    ]
+                    // num: [
+                    //     {required: true, message: '数量不能为空', trigger: 'blur'},
+                    //     {type: 'number', message: '数量必须为数字', trigger: 'blur'}
+                    // ]
                 }
 
             }
@@ -249,8 +272,22 @@
             // resetForm(formName) {
             //     this.$refs[formName].resetFields();
             // },
-
-
+            //底库存提示 class
+            tableRowClassName({row, rowIndex}){
+                if(row.minnum){
+                    if(parseInt(row.minnum) > parseInt(row.num)){
+                        return 'min-row';
+                    }else {
+                        return '';
+                    }
+                }
+            },
+            //操作按钮 class
+            rowClass ({ row, column, rowIndex, columnIndex }) {
+                if (columnIndex === 8) {
+                    return 'no-min-num'
+                }
+            },
             //搜索框显示远程数据库数据
             querySearchAsync(queryString, cb) {
                 let list = [];
@@ -279,7 +316,7 @@
             },
             //搜索框辅助函数 暂时没啥用
             handleSelect(item) {
-                // console.log(item);
+                //console.log(item);
             },
             searchProduct() {
                 this.getdata({
@@ -464,7 +501,6 @@
         created() {
             this.user_id = JSON.parse(localStorage.getItem('key')).user_id
             this.getdata();
-
         },
         filters: {
             // currency (num) {
@@ -514,6 +550,17 @@
 
         .table-wrap {
             .el-table {
+                /deep/ .min-row {
+                    background-color: #F56C6C;
+                    color: #ffffff;
+                }
+                /deep/ .hover-row > td {
+                    /*background-color: #ffffff;*/
+                    color: #606266;
+                }
+                /deep/ .no-min-num {
+                    background-color: #ffffff;
+                }
                 td {
                     text-align: center;
                 }
