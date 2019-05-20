@@ -1,6 +1,6 @@
 <template>
     <div class="Hhome">
-        <el-header class="Hheader" >
+        <el-header class="Hheader">
             <el-row class="">
                 <el-col :span="3">
                     <div class="row-logo">
@@ -9,17 +9,21 @@
                 </el-col>
                 <el-col :span="21">
                     <el-menu
-                            :default-active="activeIndex2"
+                            :default-active="this.$route.path"
                             class="el-menu-demo"
                             mode="horizontal"
-                            @select="handleSelect">
-
-                            <el-menu-item index="1">
-                                <router-link class="el-menu-demo-a" to="/home">
-                                    库存概览
-                                </router-link>
-                            </el-menu-item>
-
+                            @select="handleSelect"
+                            router>
+                        <el-menu-item index="/home">
+                            <router-link class="el-menu-demo-a" to="/home">
+                                库存概览
+                            </router-link>
+                        </el-menu-item>
+                        <el-menu-item index="/librarylist">
+                            <router-link class="el-menu-demo-a" to="/librarylist">
+                                出入库详细
+                            </router-link>
+                        </el-menu-item>
                         <!--<el-submenu index="2">-->
                         <!--<template slot="title">我的工作台</template>-->
                         <!--<el-menu-item index="2-1">选项1</el-menu-item>-->
@@ -40,12 +44,12 @@
         data() {
             return {
                 activeIndex: '1',
-                activeIndex2: '1'
+                activeIndex2: '2'
             }
         },
         methods: {
             handleSelect(key, keyPath) {
-                console.log(key, keyPath);
+                //console.log(key, keyPath);
             }
         }
     }
@@ -55,13 +59,15 @@
     .Hhome {
         padding: 0;
         border-bottom: 1px solid #eeeeee;
+
         .Hheader {
+            background-color: #ffffff;
             width: 100%;
             position: fixed;
             top: 0px;
             padding: 0;
             border-bottom: 1px solid #eeeeee;
-            z-index: 2;
+            z-index: 20;
 
             .row-logo {
                 height: 60px;
@@ -71,6 +77,7 @@
 
             .el-menu-demo {
                 border-bottom: none;
+
                 .el-menu-demo-a {
                     text-decoration: none;
                 }
