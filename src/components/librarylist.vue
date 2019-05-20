@@ -14,10 +14,16 @@
                 </li>
             </ul>
         </div>
+        <div class="change-btn">
+            <el-button @click="getall">显示全部信息</el-button>
+            <el-button @click="getinlibrary">只显示入库信息</el-button>
+            <el-button @click="getoutlibrary">只显示出库信息</el-button>
+        </div>
         <div class="library-list-table">
             <el-table
                     :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
                     border
+                    height="430"
                     class="main-table"
                     style="width: 100%"><!--:data 是分页的重点-->
                 <el-table-column
@@ -34,6 +40,17 @@
                     <template slot-scope="scope">
                         <!--<i class="el-icon-time"></i>-->
                         <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="name"
+                        label="类型"
+                        width="120">
+                    <template slot-scope="scope">
+                        <!--<i class="el-icon-time"></i>-->
+                        <span v-if="scope.row.status == 0" style="margin-left: 10px">入库</span>
+                        <span v-if="scope.row.status == 1" style="margin-left: 10px">出库</span>
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -93,6 +110,7 @@
                 inpricetotle: null,
                 outpricetotle: null,
                 tableData: [],
+                copetableData: [],
                 //分页初始页
                 currentPage: 1,
                 //分页每页数据
@@ -101,7 +119,7 @@
         },
         computed:{
             income() {
-                return (this.inpricetotle - this.outpricetotle)
+                return (this.outpricetotle - this.inpricetotle)
             }
         },
         methods: {
@@ -113,7 +131,7 @@
                     .then((data) => {
                         this.inpricetotle = data.data.inpricetotle;
                         this.outpricetotle = data.data.outpricetotle;
-                        // console.log(data)
+                        console.log(data)
                     })
                     .catch(() => {
                     })
@@ -123,8 +141,6 @@
                 this.axios.post('/api/librarylist/librarylist',{
                     "user_id":this.$store.state.user_id.user_id
                 }).then((data) => {
-
-
                     data.data.librarylist.forEach((item, index) => {
                         if(item.date) {
                             let date = new Date(parseInt(item.date));
@@ -138,7 +154,8 @@
                         }
                     })
                     this.tableData = data.data.librarylist;
-                    console.log(data)
+                    this.copetableData = data.data.librarylist;
+                    // console.log(data)
                 }).catch((error) => {
                     console.log(error)
                 })
@@ -151,6 +168,33 @@
             handleSizeChange(size) {
                 this.pagesize = size
             },
+            //只显示入库信息
+            getinlibrary () {
+                let newtableData = [];
+                this.copetableData.forEach((item, index) => {
+                    if(item.status == 0) {
+                        newtableData.push(item)
+                    }
+                });
+                this.tableData = newtableData
+            },
+
+            //只显示出库信息
+            getoutlibrary () {
+                let newtableData = [];
+                this.copetableData.forEach((item, index) => {
+                    if(item.status == 1) {
+                        newtableData.push(item)
+                    }
+                });
+                this.tableData = newtableData
+            },
+
+            //显示全部库存信息
+            getall() {
+                this.tableData = this.copetableData
+            }
+
         },
         components: {
             Hheader
@@ -158,6 +202,9 @@
         mounted() {
             this.getOverview();
             this.getlibrarylist();
+        },
+        created(){
+
         }
     }
 </script>
@@ -166,8 +213,8 @@
     .library-list {
 
         .library-list-table{
-            width: 80%;
-            margin: 0 auto;
+            width: 90%;
+            margin: 30px auto 30px;
         }
         .library-list-main {
             margin-top: 80px;
@@ -190,6 +237,14 @@
                     }
                 }
             }
+        }
+        .page {
+            margin-top: 20px;
+        }
+        .change-btn {
+            text-align: left;
+            width: 90%;
+            margin: 50px auto 0;
         }
     }
 

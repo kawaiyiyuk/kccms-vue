@@ -521,6 +521,8 @@
 
 <style lang="scss" scoped>
     .hmain {
+        width: 90%;
+        margin: 0 auto;
         .main-header {
             border-top: 1px solid #eeeeee;
 

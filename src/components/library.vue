@@ -255,7 +255,9 @@
         <!--出库弹窗-->
         <el-dialog class="add-dialog" title="添加出库商品" :visible.sync="outlibraryDialog" :modal-append-to-body='false'>
             <el-form :model="formoutlibrary" class="main-dialog" :rules="rules" ref="formoutlibrary">
-
+                <el-form-item label="商品名称" :label-width="formLabelWidth" prop="price">
+                    <el-input v-model="tableData.name" :disabled="true"></el-input>
+                </el-form-item>
                 <el-form-item label="商品价格" :label-width="formLabelWidth" prop="price">
                     <el-input v-model.number="formoutlibrary.price"></el-input>
                 </el-form-item>
@@ -566,6 +568,7 @@
                 this.formoutlibrary.date = this.DataValueOutli;
                 this.formoutlibrary.product_id = this.$store.state.productId;
                 this.formoutlibrary.user_id = this.$store.state.user_id.user_id;
+                this.formoutlibrary.name = this.tableData.name;
                 this.$refs[OutFormpost].validate((valid) => {
                     if (valid) {
                         this.axios.post('api/library/outData',
@@ -607,7 +610,7 @@
 <style lang="scss" scoped>
     .library {
         .el-tabs__nav-scroll {
-            width: 1200px;
+            width: 90%;
         }
 
         .library-main {
@@ -621,7 +624,7 @@
             }
 
             .library-main-header {
-                width: 1200px;
+                width: 90%;
                 margin: 0 auto 20px;
                 text-align: left;
 
@@ -656,7 +659,7 @@
     }
 
     /deep/ .change-tip {
-        width: 1200px;
+        width: 90%;
         margin: 0 auto 0;
         position: relative;
 
