@@ -4,8 +4,7 @@
             <el-container class="Hwarp">
                     <Hheader></Hheader>
                 <el-container class="Hmain">
-                        <Haside></Haside>
-
+                        <!--<Haside></Haside>-->
                     <el-main>
                         <Hmain></Hmain>
                     </el-main>
