@@ -455,7 +455,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.axios.post('http://127.0.0.1:3000/library/deleteinlibrary', {
+                    this.axios.post('/api/library/deleteinlibrary', {
                         user_id: user_id,
                         product_id: product_id,
                         libry_id: libry_id,
@@ -492,7 +492,7 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    this.axios.post('http://127.0.0.1:3000/library/deleteoutlibrary', {
+                    this.axios.post('/api/library/deleteoutlibrary', {
                         libry_id: libry_id,
                         product_id: product_id,
                         user_id: user_id,
